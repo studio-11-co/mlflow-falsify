@@ -1,0 +1,53 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "mlflow-falsify: MLflow plugin for automatic PRML manifest hash tagging"
+abstract: >-
+  An MLflow Run Context Provider plugin that auto-discovers a PRML
+  (Pre-Registered ML Manifest) v0.1 file in the working directory or any
+  parent, computes its byte-equivalent canonical SHA-256, and tags every
+  mlflow.start_run() with the manifest hash plus metric, comparator,
+  threshold, and dataset id. Zero workflow change for MLflow users.
+authors:
+  - family-names: "Öztürk"
+    given-names: "Cüneyt"
+    affiliation: "Studio 11 Turkey Ltd. Şti."
+    email: "hello@studio-11.co"
+type: software
+license: MIT
+repository-code: "https://github.com/studio-11-co/mlflow-falsify"
+url: "https://falsify.dev"
+version: "0.1.1"
+date-released: 2026-05-16
+keywords:
+  - "PRML"
+  - "pre-registration"
+  - "MLflow"
+  - "ML evaluation"
+  - "AI safety"
+  - "reproducibility"
+  - "content addressing"
+identifiers:
+  - type: url
+    value: "https://spec.falsify.dev/v0.1"
+    description: "PRML v0.1 specification"
+  - type: url
+    value: "https://pypi.org/project/mlflow-falsify/"
+    description: "PyPI package"
+preferred-citation:
+  type: software
+  title: "mlflow-falsify"
+  authors:
+    - family-names: "Öztürk"
+      given-names: "Cüneyt"
+  year: 2026
+  url: "https://github.com/studio-11-co/mlflow-falsify"
+  version: "0.1.1"
+references:
+  - type: software
+    title: "PRML v0.1 specification (falsify reference implementation)"
+    authors:
+      - family-names: "Öztürk"
+        given-names: "Cüneyt"
+    year: 2026
+    doi: "10.5281/zenodo.20177839"
+    url: "https://spec.falsify.dev/v0.1"
