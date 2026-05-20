@@ -3,7 +3,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/mlflow-falsify.svg)](https://pypi.org/project/mlflow-falsify/)
 [![Python versions](https://img.shields.io/pypi/pyversions/mlflow-falsify.svg)](https://pypi.org/project/mlflow-falsify/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20235451.svg)](https://doi.org/10.5281/zenodo.20235451)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20235451-blue.svg)](https://doi.org/10.5281/zenodo.20235451)
 [![Spec: PRML v0.1](https://img.shields.io/badge/spec-PRML%20v0.1-39d98a)](https://spec.falsify.dev/v0.1)
 
 Drop a PRML manifest in your repo. Every MLflow run gets cryptographically bound to it. No workflow changes.
