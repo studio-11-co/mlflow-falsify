@@ -112,5 +112,79 @@ class RunContextTests(unittest.TestCase):
                 self.assertNotIn("prml.manifest_hash", tags)
 
 
+class TagScopeTests(unittest.TestCase):
+    """MLFLOW_FALSIFY_TAG_SCOPE env var routes descriptive tags off-run."""
+
+    def _with_scope(self, value: str | None):
+        # Context manager helper: set env var, restore on exit.
+        class _Scope:
+            def __init__(self, v: str | None) -> None:
+                self.v = v
+                self.prev: str | None = None
+                self.had: bool = False
+
+            def __enter__(self_inner) -> None:
+                self_inner.had = "MLFLOW_FALSIFY_TAG_SCOPE" in os.environ
+                self_inner.prev = os.environ.get("MLFLOW_FALSIFY_TAG_SCOPE")
+                if self_inner.v is None:
+                    os.environ.pop("MLFLOW_FALSIFY_TAG_SCOPE", None)
+                else:
+                    os.environ["MLFLOW_FALSIFY_TAG_SCOPE"] = self_inner.v
+
+            def __exit__(self_inner, *exc: object) -> None:
+                if self_inner.had:
+                    os.environ["MLFLOW_FALSIFY_TAG_SCOPE"] = self_inner.prev or ""
+                else:
+                    os.environ.pop("MLFLOW_FALSIFY_TAG_SCOPE", None)
+
+        return _Scope(value)
+
+    def test_default_scope_emits_all_tags(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            (root / ".prml.yaml").write_text(TV_001_YAML, encoding="utf-8")
+            with _Chdir(root), self._with_scope(None):
+                tags = FalsifyRunContextProvider().tags()
+            self.assertEqual(tags.get("prml.manifest_hash"), TV_001_HASH)
+            self.assertEqual(tags.get("prml.metric"), "accuracy")
+            self.assertEqual(tags.get("prml.threshold"), "0.85")
+            self.assertEqual(tags.get("prml.dataset_id"), "imagenet-val-2012")
+
+    def test_experiment_scope_keeps_only_audit_essential(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            (root / ".prml.yaml").write_text(TV_001_YAML, encoding="utf-8")
+            with _Chdir(root), self._with_scope("experiment"):
+                tags = FalsifyRunContextProvider().tags()
+            # Audit-essential tags stay
+            self.assertEqual(tags.get("prml.manifest_hash"), TV_001_HASH)
+            self.assertIn("prml.manifest_path", tags)
+            # Descriptive tags lifted off-run
+            self.assertNotIn("prml.metric", tags)
+            self.assertNotIn("prml.comparator", tags)
+            self.assertNotIn("prml.threshold", tags)
+            self.assertNotIn("prml.dataset_id", tags)
+            self.assertNotIn("prml.version", tags)
+
+    def test_unknown_scope_falls_back_to_run(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            (root / ".prml.yaml").write_text(TV_001_YAML, encoding="utf-8")
+            with _Chdir(root), self._with_scope("nonsense"):
+                tags = FalsifyRunContextProvider().tags()
+            self.assertEqual(tags.get("prml.metric"), "accuracy")
+
+    def test_compute_tags_with_explicit_path(self) -> None:
+        from mlflow_falsify.run_context import _compute_tags
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            manifest = root / "subdir" / "claim.yaml"
+            manifest.parent.mkdir()
+            manifest.write_text(TV_001_YAML, encoding="utf-8")
+            tags = _compute_tags(manifest)
+            self.assertEqual(tags.get("prml.manifest_hash"), TV_001_HASH)
+
+
 if __name__ == "__main__":
     unittest.main()

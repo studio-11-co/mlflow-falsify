@@ -36,6 +36,20 @@ from mlflow_falsify._canonical import manifest_hash
 
 MANIFEST_FILENAMES = (".prml.yaml", "prml.yaml")
 
+# Tag-scope routing. Two tags are audit-essential and always emitted per-run:
+#   prml.manifest_hash  — the SHA-256 commitment this run is bound to
+#   prml.manifest_path  — the file the provider resolved (for diagnostics)
+# The remaining descriptive fields can optionally be lifted to experiment
+# level via `mlflow_falsify.tag_experiment()` in HPO sweeps where the
+# claim is identical across thousands of runs. Controlled by env var
+# MLFLOW_FALSIFY_TAG_SCOPE: "run" (default) or "experiment".
+_RUN_LEVEL_ALWAYS = ("prml.manifest_hash", "prml.manifest_path")
+
+
+def _tag_scope() -> str:
+    raw = os.environ.get("MLFLOW_FALSIFY_TAG_SCOPE", "run").strip().lower()
+    return raw if raw in ("run", "experiment") else "run"
+
 
 def _find_manifest(start: Optional[Path] = None) -> Optional[Path]:
     """Walk up from `start` (default CWD) looking for a PRML manifest."""
@@ -85,45 +99,56 @@ class FalsifyRunContextProvider(RunContextProvider):
         return _find_manifest() is not None
 
     def tags(self) -> Dict[str, str]:
-        result: Dict[str, str] = {}
-        manifest_path = _find_manifest()
-        if manifest_path is None:
-            return result
-
-        result["prml.manifest_path"] = _relative_path(manifest_path)
-
-        spec = _load_manifest(manifest_path)
-        if spec is None:
-            return result
-
-        # Hash the canonical bytes. Anything raised here is swallowed —
-        # tag emission must never break the run.
-        try:
-            result["prml.manifest_hash"] = manifest_hash(spec)
-        except Exception:
-            pass
-
-        version = _safe_str(spec.get("version"))
-        if version is not None:
-            result["prml.version"] = version
-
-        metric = _safe_str(spec.get("metric"))
-        if metric is not None:
-            result["prml.metric"] = metric
-
-        comparator = _safe_str(spec.get("comparator"))
-        if comparator is not None:
-            result["prml.comparator"] = comparator
-
-        threshold = spec.get("threshold")
-        threshold_str = _safe_str(threshold)
-        if threshold_str is not None:
-            result["prml.threshold"] = threshold_str
-
-        dataset = spec.get("dataset")
-        if isinstance(dataset, dict):
-            dataset_id = _safe_str(dataset.get("id"))
-            if dataset_id is not None:
-                result["prml.dataset_id"] = dataset_id
-
+        result = _compute_tags()
+        if _tag_scope() == "experiment":
+            return {k: v for k, v in result.items() if k in _RUN_LEVEL_ALWAYS}
         return result
+
+
+def _compute_tags(manifest_path: Optional[Path] = None) -> Dict[str, str]:
+    """Compute the full PRML tag set for the manifest at `manifest_path`
+    (or auto-discovered from CWD if None). Returns an empty dict when no
+    manifest is found or parseable. Never raises."""
+    result: Dict[str, str] = {}
+    if manifest_path is None:
+        manifest_path = _find_manifest()
+    if manifest_path is None:
+        return result
+
+    result["prml.manifest_path"] = _relative_path(manifest_path)
+
+    spec = _load_manifest(manifest_path)
+    if spec is None:
+        return result
+
+    # Hash the canonical bytes. Anything raised here is swallowed —
+    # tag emission must never break the run.
+    try:
+        result["prml.manifest_hash"] = manifest_hash(spec)
+    except Exception:
+        pass
+
+    version = _safe_str(spec.get("version"))
+    if version is not None:
+        result["prml.version"] = version
+
+    metric = _safe_str(spec.get("metric"))
+    if metric is not None:
+        result["prml.metric"] = metric
+
+    comparator = _safe_str(spec.get("comparator"))
+    if comparator is not None:
+        result["prml.comparator"] = comparator
+
+    threshold = spec.get("threshold")
+    threshold_str = _safe_str(threshold)
+    if threshold_str is not None:
+        result["prml.threshold"] = threshold_str
+
+    dataset = spec.get("dataset")
+    if isinstance(dataset, dict):
+        dataset_id = _safe_str(dataset.get("id"))
+        if dataset_id is not None:
+            result["prml.dataset_id"] = dataset_id
+
+    return result

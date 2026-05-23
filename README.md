@@ -41,6 +41,27 @@ When a `.prml.yaml` or `prml.yaml` is found in the current directory or any ance
 
 Missing or malformed fields are silently skipped. The provider never raises into your run.
 
+## HPO sweeps and tag scope
+
+In an HPO sweep the same PRML claim repeats across thousands of runs, so emitting the 5 descriptive tags per-run becomes pure tag noise. As of v0.2.0 the plugin supports lifting them to experiment level:
+
+```bash
+export MLFLOW_FALSIFY_TAG_SCOPE=experiment
+```
+
+```python
+import mlflow_falsify
+
+mlflow.set_experiment("credit-scorer-hpo")
+mlflow_falsify.tag_experiment()  # idempotent; sets metric/comparator/threshold/dataset_id/version once
+
+for params in hpo_grid:
+    with mlflow.start_run():
+        ...  # only prml.manifest_hash and prml.manifest_path attach per-run
+```
+
+Default behaviour (`MLFLOW_FALSIFY_TAG_SCOPE=run` or unset) is unchanged: all 7 tags attach per-run, backward-compatible with v0.1.x.
+
 ## Why this matters
 
 - **EU AI Act Article 12 evidence layer.** Every logged run carries a tamper-evident pointer to the claim it was meant to test.

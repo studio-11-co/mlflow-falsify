@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mlflow-falsify"
-version = "0.1.3"
+version = "0.2.0"
 description = "MLflow plugin: automatic PRML manifest hash tagging for runs. Pre-registered ML evaluation claims."
 readme = "README.md"
 requires-python = ">=3.9"
