@@ -10,10 +10,9 @@ readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [
-    { name = "Cüneyt Öztürk", email = "hello@studio-11.co" },
+    { name = "Cüneyt Öztürk", email = "hello@falsify.dev" },
 ]
 maintainers = [
-    { name = "Studio 11", email = "hello@studio-11.co" },
 ]
 keywords = [
     "mlflow",

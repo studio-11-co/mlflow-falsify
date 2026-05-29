@@ -87,4 +87,4 @@ Where the manifest hash this plugin attaches fits in major AI governance framewo
 
 ## License
 
-MIT. Copyright 2026 Studio 11 / Cüneyt Öztürk.
+MIT. Copyright 2026 Cüneyt Öztürk.
