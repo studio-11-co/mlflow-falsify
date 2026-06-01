@@ -81,7 +81,7 @@ Default behaviour (`MLFLOW_FALSIFY_TAG_SCOPE=run` or unset) is unchanged: all 7 
 
 Where the manifest hash this plugin attaches fits in major AI governance frameworks (FULL / PARTIAL / NONE tagged):
 
-- [EU AI Act Article 12](https://spec.falsify.dev/eu-ai-act/article-12/) — automated-logging pattern for the 2 August 2026 high-risk deadline
+- [EU AI Act Article 12](https://spec.falsify.dev/eu-ai-act/article-12/) — automated-logging pattern for the 2 December 2027 high-risk deadline
 - [NIST AI RMF 1.0](https://spec.falsify.dev/nist-ai-rmf/) — GOVERN / MAP / MEASURE / MANAGE subcategory map
 - [ISO/IEC 42001:2023](https://spec.falsify.dev/iso-42001/) — AI Management System clause-by-clause evidence map
 
