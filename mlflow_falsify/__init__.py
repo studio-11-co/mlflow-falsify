@@ -13,7 +13,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Dict, Optional, Union
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 __all__ = ["FalsifyRunContextProvider", "tag_experiment"]
 
 

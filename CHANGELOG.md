@@ -2,6 +2,11 @@
 
 All notable changes to mlflow-falsify will be documented in this file. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.1] - 2026-06-02
+
+### Fixed
+- Docs: corrected the EU AI Act Article 12 reference date to **2 December 2027** (the high-risk obligation date, deferred from 2 August 2026 by the EU Digital Omnibus). No code changes; republished so the PyPI README reflects the correct date.
+
 ## [0.2.0] - 2026-05-23
 
 ### Added
