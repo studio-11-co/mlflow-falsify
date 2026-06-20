@@ -2,6 +2,15 @@
 
 All notable changes to mlflow-falsify will be documented in this file. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2026-06-19
+
+### Fixed
+- **Correctness (critical): manifest hash now matches the `falsify` reference for integer-valued v0.1 thresholds.** The vendored canonicalizer skipped the v0.1 integer→float coercion (`threshold: 1` must canonicalize as `1.0`) and used non-reference YAML emitter settings, so a claim locked through this plugin and verified with the `falsify` CLI produced a spurious `TAMPERED` verdict. The adapter now delegates to `falsify_prml.canonicalize`/`manifest_hash` (single source of truth) instead of a private copy.
+
+### Changed
+- Added `falsify>=0.3.8` as a dependency (the reference canonicalizer).
+- Added reference-parity tests asserting the adapter hashes byte-identically to `falsify_prml` across float, integer, and small-float thresholds — the integer case the float-only fixture never caught.
+
 ## [0.2.1] - 2026-06-02
 
 ### Fixed

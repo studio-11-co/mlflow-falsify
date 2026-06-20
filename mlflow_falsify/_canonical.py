@@ -1,28 +1,40 @@
-"""Canonical YAML serialization for PRML manifests.
+"""Canonical serialization for PRML manifests.
 
-Vendored byte-for-byte from falsify v0.1.4 (`falsify.py::_canonicalize`).
-Reference: Zenodo DOI 10.5281/zenodo.20177839. Spec: https://spec.falsify.dev/v0.1
+Delegates to the reference implementation in ``falsify_prml`` (the ``falsify``
+package) so this adapter is guaranteed byte-identical to the spec and the
+other reference impls (py/js/go/rust).
+
+Do NOT vendor a private copy of the canonicalizer here: any drift (e.g. a
+missing v0.1 integer->float coercion, or different YAML emitter settings)
+produces a different SHA-256 and therefore a spurious TAMPERED verdict — the
+exact failure mode falsify exists to prevent.
+
+The ``falsify_prml`` import is deliberately lazy (inside the functions, not at
+module top level): this module is imported transitively while MLflow is still
+registering its run-context-provider entry points, and pulling another package
+into that window can trip MLflow's partially-initialised-module guard. By the
+time these functions are actually called (run tag time), MLflow has finished
+importing.
+
+Spec: https://spec.falsify.dev/v0.1
 """
 
 from __future__ import annotations
 
-import hashlib
 from typing import Any
 
-import yaml
+__all__ = ["canonicalize", "manifest_hash"]
 
 
 def canonicalize(spec: Any) -> str:
-    """Render a YAML tree in a stable form suitable for hashing."""
-    return yaml.safe_dump(
-        spec,
-        sort_keys=True,
-        default_flow_style=False,
-        allow_unicode=True,
-        width=4096,
-    )
+    """Render a PRML manifest in canonical form (reference implementation)."""
+    from falsify_prml import canonicalize as _canonicalize
+
+    return _canonicalize(spec)
 
 
 def manifest_hash(spec: Any) -> str:
     """Return the lowercase hex SHA-256 of the canonical bytes of `spec`."""
-    return hashlib.sha256(canonicalize(spec).encode("utf-8")).hexdigest()
+    from falsify_prml import manifest_hash as _manifest_hash
+
+    return _manifest_hash(spec)

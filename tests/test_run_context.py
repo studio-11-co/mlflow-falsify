@@ -112,6 +112,53 @@ class RunContextTests(unittest.TestCase):
                 self.assertNotIn("prml.manifest_hash", tags)
 
 
+class ReferenceParityTests(unittest.TestCase):
+    """The adapter MUST hash byte-identically to the falsify_prml reference.
+
+    Any divergence produces a spurious TAMPERED verdict when a claim locked via
+    this plugin is verified with the `falsify` CLI. The earlier vendored
+    canonicalizer diverged on integer-valued v0.1 thresholds (it skipped the
+    int->float coercion), which the float-only TV-001 fixture never caught.
+    """
+
+    def _parity(self, manifest: dict) -> None:
+        import falsify_prml
+        from mlflow_falsify._canonical import manifest_hash
+
+        self.assertEqual(
+            manifest_hash(manifest),
+            falsify_prml.manifest_hash(manifest),
+            f"adapter hash diverged from falsify_prml reference for {manifest!r}",
+        )
+
+    def _base(self, threshold) -> dict:
+        return {
+            "version": "prml/0.1",
+            "claim_id": "01900000-0000-7000-8000-000000000000",
+            "created_at": "2026-05-01T12:00:00Z",
+            "metric": "accuracy",
+            "comparator": ">=",
+            "threshold": threshold,
+            "dataset": {
+                "id": "imagenet-val-2012",
+                "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            },
+            "seed": 42,
+            "producer": {"id": "studio-11.co"},
+        }
+
+    def test_float_threshold_parity(self) -> None:
+        self._parity(self._base(0.85))
+
+    def test_integer_threshold_parity(self) -> None:
+        # The regression case: v0.1 requires integer-valued thresholds to
+        # canonicalize as floats ("1" -> "1.0"). The vendored copy did not.
+        self._parity(self._base(1))
+
+    def test_small_float_threshold_parity(self) -> None:
+        self._parity(self._base(1e-6))
+
+
 class TagScopeTests(unittest.TestCase):
     """MLFLOW_FALSIFY_TAG_SCOPE env var routes descriptive tags off-run."""
 
