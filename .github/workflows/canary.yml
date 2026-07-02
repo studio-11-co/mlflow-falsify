@@ -1,0 +1,28 @@
+# Canary: does the LATEST mlflow release still work with our plugin?
+# Weekly + manual. Failure = mlflow moved under us — fix before a user does.
+name: canary (latest mlflow)
+
+on:
+  schedule:
+    - cron: "20 5 * * 1"   # Mondays 05:20 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      - name: Install plugin + LATEST mlflow (unpinned)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e . pytest
+          python -m pip install --upgrade mlflow
+          python -c "import mlflow; print('mlflow', mlflow.__version__)"
+      - name: Test suite against latest mlflow
+        run: python -m pytest tests/ -q
