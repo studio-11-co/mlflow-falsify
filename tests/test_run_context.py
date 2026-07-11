@@ -233,5 +233,31 @@ class TagScopeTests(unittest.TestCase):
             self.assertEqual(tags.get("prml.manifest_hash"), TV_001_HASH)
 
 
+class TestVersionSelfReport(unittest.TestCase):
+    """Regression guard for the 0.2.2 wheel self-reporting __version__ 0.2.1.
+
+    __version__ is single-sourced from package metadata; when the package is
+    installed, the two must agree. When running from a checkout without an
+    install, the fallback string must still look like a version.
+    """
+
+    def test_version_matches_installed_metadata(self) -> None:
+        import mlflow_falsify
+
+        try:
+            from importlib.metadata import version
+            installed = version("mlflow-falsify")
+        except Exception:
+            self.skipTest("mlflow-falsify is not installed; metadata unavailable")
+        self.assertEqual(mlflow_falsify.__version__, installed)
+
+    def test_version_is_well_formed(self) -> None:
+        import re
+
+        import mlflow_falsify
+
+        self.assertRegex(mlflow_falsify.__version__, r"^\d+\.\d+\.\d+")
+
+
 if __name__ == "__main__":
     unittest.main()

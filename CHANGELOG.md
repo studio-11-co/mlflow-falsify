@@ -2,6 +2,11 @@
 
 All notable changes to mlflow-falsify will be documented in this file. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3] - 2026-07-12
+
+### Fixed
+- **`__version__` self-report.** The 0.2.2 wheel reported `__version__ == "0.2.1"` because the string in `__init__.py` was updated by hand and missed. The version is now single-sourced from package metadata (`importlib.metadata.version("mlflow-falsify")`), with a plain-string fallback only for uninstalled checkouts, so it can never drift from `pyproject.toml` again. Regression test added. No functional change to tagging or hashing.
+
 ## [0.2.2] - 2026-06-19
 
 ### Fixed

@@ -13,7 +13,15 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Dict, Optional, Union
 
-__version__ = "0.2.1"
+# Single-sourced from package metadata (pyproject.toml) so the self-reported
+# version can never drift from the released wheel again (0.2.2 shipped
+# reporting "0.2.1"). The fallback covers running from a checkout where the
+# package is not installed.
+try:
+    from importlib.metadata import version as _v
+    __version__ = _v("mlflow-falsify")
+except Exception:
+    __version__ = "0.2.3"
 __all__ = ["FalsifyRunContextProvider", "tag_experiment"]
 
 
