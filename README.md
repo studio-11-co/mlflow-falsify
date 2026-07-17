@@ -27,6 +27,24 @@ with mlflow.start_run():
     # The run now carries prml.manifest_hash and friends as tags.
 ```
 
+### Verify the locked predicate at run end (0.3.0+)
+
+Tagging proves which bar the run was bound to; `locked_run` also checks it:
+
+```python
+import mlflow, mlflow_falsify
+
+with mlflow_falsify.locked_run():
+    mlflow.log_metric("accuracy", 0.91)
+# run is now tagged:
+#   prml.verdict  = PASS | FAIL | UNVERIFIED | TAMPERED
+#   prml.observed = 0.91
+```
+
+`TAMPERED` means the manifest changed between run start and verification —
+the goalpost moved mid-run. Post-hoc: `mlflow_falsify.verify_run(run_id)`.
+Set `MLFLOW_FALSIFY_STRICT=1` to raise on FAIL/TAMPERED in CI.
+
 ## What gets tagged
 
 When a `.prml.yaml` or `prml.yaml` is found in the current directory or any ancestor, every run is tagged with:

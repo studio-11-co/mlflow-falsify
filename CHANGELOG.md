@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0] - 2026-07-18
+
+### Added
+- **Verify-on-run-end.** The adapter no longer only *tags* provenance — it can now check the locked predicate. `mlflow_falsify.locked_run()` wraps `mlflow.start_run()` and, on exit, evaluates the manifest's metric/comparator/threshold against the run's logged metrics, tagging `prml.verdict` (PASS / FAIL / UNVERIFIED / TAMPERED) and `prml.observed`. TAMPERED fires when the manifest file changed between run start and verification (goalpost moved mid-run). `mlflow_falsify.verify_run(run_id)` does the same post-hoc for any run. `MLFLOW_FALSIFY_STRICT=1` raises `FalsifyVerdictError` on FAIL/TAMPERED for CI use.
+- `==` comparator honors spec §5.1 tolerance (default 1e-9, `metric_args.tolerance` override), matching falsify 0.3.11.
+- End-to-end test suite against a real MLflow tracking backend (sqlite), covering all four verdicts, mid-run tamper, strict mode, and tolerance.
+
 All notable changes to mlflow-falsify will be documented in this file. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.2.3] - 2026-07-12

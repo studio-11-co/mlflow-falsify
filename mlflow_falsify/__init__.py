@@ -21,8 +21,8 @@ try:
     from importlib.metadata import version as _v
     __version__ = _v("mlflow-falsify")
 except Exception:
-    __version__ = "0.2.3"
-__all__ = ["FalsifyRunContextProvider", "tag_experiment"]
+    __version__ = "0.3.0"
+__all__ = ["FalsifyRunContextProvider", "tag_experiment", "verify_run", "locked_run", "FalsifyVerdictError"]
 
 
 def __getattr__(name: str):
@@ -31,6 +31,9 @@ def __getattr__(name: str):
         return FalsifyRunContextProvider
     if name == "tag_experiment":
         return tag_experiment
+    if name in ("verify_run", "locked_run", "FalsifyVerdictError"):
+        from mlflow_falsify import verify as _verify
+        return getattr(_verify, name)
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
