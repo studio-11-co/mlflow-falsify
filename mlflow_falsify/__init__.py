@@ -21,7 +21,7 @@ try:
     from importlib.metadata import version as _v
     __version__ = _v("mlflow-falsify")
 except Exception:
-    __version__ = "0.3.0"
+    __version__ = "0.3.1"
 __all__ = ["FalsifyRunContextProvider", "tag_experiment", "verify_run", "locked_run", "FalsifyVerdictError"]
 
 

@@ -16,8 +16,8 @@ type: software
 license: MIT
 repository-code: "https://github.com/studio-11-co/mlflow-falsify"
 url: "https://falsify.dev"
-version: "0.3.0"
-date-released: 2026-05-16
+version: "0.3.1"
+date-released: 2026-10-28
 keywords:
   - "PRML"
   - "pre-registration"
@@ -41,7 +41,7 @@ preferred-citation:
       given-names: "Cüneyt"
   year: 2026
   url: "https://github.com/studio-11-co/mlflow-falsify"
-  version: "0.3.0"
+  version: "0.3.1"
 references:
   - type: software
     title: "PRML v0.1 specification (falsify reference implementation)"

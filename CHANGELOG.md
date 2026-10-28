@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1] - 2026-10-28
+
+### Fixed
+- **Package metadata.** `requires-python` said `>=3.9`, but the `falsify` dependency needs Python 3.11 or later, so installs on 3.9 and 3.10 failed inside the resolver. It now says `>=3.11` (classifiers 3.11 to 3.13). The `Repository` and `Issues` URLs pointed at the `falsify` repository; they now point here.
+
+### Added
+- Test workflow on push and pull request (Python 3.11 and 3.12), alongside the weekly canary against the latest MLflow.
+
 ## [0.3.0] - 2026-07-18
 
 ### Added
